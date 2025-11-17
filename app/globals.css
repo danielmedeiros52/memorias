@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-slate-50 text-slate-900;
+}
+
+.container-page {
+  @apply max-w-6xl mx-auto px-4 py-6;
+}
+
+.card {
+  @apply bg-white shadow rounded p-6 border border-slate-200;
+}
+
+.btn-primary {
+  @apply bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700;
+}
+
+.btn-secondary {
+  @apply bg-slate-200 text-slate-800 px-4 py-2 rounded hover:bg-slate-300;
+}
+
+.input {
+  @apply border border-slate-300 rounded px-3 py-2 w-full;
+}
