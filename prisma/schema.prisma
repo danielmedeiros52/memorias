@@ -1,0 +1,109 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Visibility {
+  publico
+  privado
+}
+
+enum MemorialStatus {
+  ativo
+  pendente_dados_familia
+  inativo
+}
+
+enum RelationshipDegree {
+  filho
+  filha
+  neto
+  neta
+  bisneto
+  bisneta
+  outro
+}
+
+model FuneralHome {
+  id           String     @id @default(cuid())
+  name         String
+  email        String     @unique
+  passwordHash String
+  contactPhone String?
+  memorials    Memorial[]
+  createdAt    DateTime   @default(now())
+}
+
+model FamilyUser {
+  id           String     @id @default(cuid())
+  name         String
+  email        String     @unique
+  passwordHash String?
+  phone        String?
+  memorials    Memorial[]
+  invites      InviteToken[]
+  createdAt    DateTime   @default(now())
+}
+
+model Memorial {
+  id              String           @id @default(cuid())
+  slug            String           @unique
+  nomeCompleto    String
+  dataNascimento  DateTime?
+  dataFalecimento DateTime?
+  naturalidade    String?
+  filiacao        String?
+  biografia       String?
+  visibilidade    Visibility       @default(publico)
+  status          MemorialStatus   @default(pendente_dados_familia)
+  funeralHomeId   String
+  familyUserId    String?
+  funeralHome     FuneralHome      @relation(fields: [funeralHomeId], references: [id])
+  family          FamilyUser?      @relation(fields: [familyUserId], references: [id])
+  descendants     Descendant[]
+  photos          Photo[]
+  dedications     Dedication[]
+  invites         InviteToken[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+}
+
+model Descendant {
+  id             String             @id @default(cuid())
+  nome           String
+  grauParentesco RelationshipDegree
+  memorialId     String
+  memorial       Memorial           @relation(fields: [memorialId], references: [id])
+}
+
+model Photo {
+  id         String   @id @default(cuid())
+  urlArquivo String
+  legenda    String?
+  ordem      Int      @default(0)
+  memorialId String
+  memorial   Memorial @relation(fields: [memorialId], references: [id])
+}
+
+model Dedication {
+  id         String   @id @default(cuid())
+  autorNome  String
+  mensagem   String
+  memorialId String
+  createdAt  DateTime @default(now())
+  memorial   Memorial @relation(fields: [memorialId], references: [id])
+}
+
+model InviteToken {
+  id           String    @id @default(cuid())
+  token        String    @unique
+  memorialId   String
+  familyUserId String
+  expiresAt    DateTime
+  memorial     Memorial  @relation(fields: [memorialId], references: [id])
+  familyUser   FamilyUser @relation(fields: [familyUserId], references: [id])
+}
